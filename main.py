@@ -7,4 +7,4 @@ if __name__ == "__main__":
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     service = get_authenticated_service()
     keyword = input('Enter a keyword: ')
-    search_videos_comments_by_keyword(service=service, q=keyword, part='id, snippet', eventType='completed', type='video')
+    search_videos_comments_by_keyword(service=service, max_pages=1, q=keyword, part='id, snippet', eventType='completed', type='video')

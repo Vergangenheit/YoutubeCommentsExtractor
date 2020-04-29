@@ -3,12 +3,12 @@ from store_comments import write_to_csv
 import os
 
 
-def get_videos(service, **kwargs):
+def get_videos(service, max_pages, **kwargs):
     final_results = []
     results = service.search().list(**kwargs).execute()
 
     i = 0
-    max_pages = 3
+    max_pages = max_pages
     while results and i < max_pages:
         final_results.extend(results['items'])
 
@@ -51,8 +51,8 @@ def search_videos_by_keyword(service, **kwargs):
         print('%s - %s' % (item['snippet']['title'], item['id']['videoId']))
 
 
-def search_videos_comments_by_keyword(service, **kwargs):
-    results = get_videos(service, **kwargs)
+def search_videos_comments_by_keyword(service, max_pages, **kwargs):
+    results = get_videos(service, max_pages, **kwargs)
     final_results = []
     for item in results:
         title = item['snippet']['title']
@@ -69,5 +69,5 @@ if __name__ == "__main__":
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     service = get_authenticated_service()
     keyword = input('Enter a keyword: ')
-    search_videos_comments_by_keyword(service=service, q=keyword, part='id, snippet', eventType='completed',
+    search_videos_comments_by_keyword(service=service, max_pages=1, q=keyword, part='id, snippet', eventType='completed',
                                       type='video')
