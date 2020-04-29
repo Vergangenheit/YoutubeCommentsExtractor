@@ -8,7 +8,6 @@ def get_videos(service, max_pages, **kwargs):
     results = service.search().list(**kwargs).execute()
 
     i = 0
-    max_pages = max_pages
     while results and i < max_pages:
         final_results.extend(results['items'])
 
