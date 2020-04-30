@@ -1,5 +1,5 @@
-from service import get_authenticated_service
-from store_comments import write_to_csv
+from extractor.service import get_authenticated_service
+from extractor.store_comments import write_to_csv
 import os
 
 

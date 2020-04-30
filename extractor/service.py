@@ -1,5 +1,5 @@
 import google.oauth2.credentials
-import config
+from extractor import config
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow

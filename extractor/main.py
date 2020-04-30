@@ -1,5 +1,4 @@
-from service import get_authenticated_service
-from searches import *
+from extractor.searches import *
 
 if __name__ == "__main__":
     # When running locally, disable OAuthlib's HTTPs verification. When
