@@ -5,11 +5,11 @@ import pickle
 from tensorflow.keras.layers import Embedding
 
 
-def load_pretr_wv(path, filename):
+def load_pretr_wv():
     # load in pre-trained word vectors
     print('Loading word vectors...')
     word2vec = {}
-    with open(os.path.join(path, '/glove.6B.%sd.txt' % config.EMBEDDING_DIM), encoding="utf8") as f:
+    with open(os.path.join(config.PATH, 'glove.6B.%sd.txt' % config.EMBEDDING_DIM), encoding="utf8") as f:
         # is just a space-separated text file in the format:
         # word vec[0] vec[1] vec[2] ...
         for line in f:
@@ -22,11 +22,12 @@ def load_pretr_wv(path, filename):
     return word2vec
 
 
-def apply_embeddings(path, word2idx_file, word2vec):
-    with open(os.path.join(path, word2idx_file), 'rb') as f:
-        word2idx = pickle.load(f)
+def apply_embeddings(word2vec):
     # prepare embedding matrix
     print('Filling pre-trained embeddings...')
+    with open(os.path.join(config.PATH, 'tokenizer.pkl'), 'rb') as f:
+        tokenizer = pickle.load(f)
+    word2idx = tokenizer.word_index
     num_words = min(config.MAX_VOCAB_SIZE, len(word2idx) + 1)
     embedding_matrix = np.zeros((num_words, config.EMBEDDING_DIM))
     for word, i in word2idx.items():
