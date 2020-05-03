@@ -3,15 +3,18 @@ import config
 import custom_loss
 import word_embeddings
 import model
-from tensorflow.data import Dataset
+import os
+import pickle
 
 
 def run_training():
     train = preprocess.load(path=config.PATH, filename=config.FILENAME, col_list=[0, 2, 3, 4, 6, 7, 8, 9],
                             dtypes=config.DTYPES)
+    targets = train[config.POSSIBLE_LABELS]
+    class_weights = custom_loss.calculating_class_weights(targets.values, 6)
+    with open(os.path.join(config.PATH, "class_weights.pkl"), "wb") as f:
+        pickle.dump(class_weights, f)
 
-    weights_loss = custom_loss.weights_for_loss(train)
-    losses = custom_loss.create_losses(weights_loss)
     # extract and load pretrained wordembeddings
     word2vec = word_embeddings.load_pretr_wv()
     # tokenize and pad sequences
@@ -21,17 +24,16 @@ def run_training():
     # build model
     m = model.build_model(embedding_layer)
     # apply class weights via custom loss
-    m.compile(loss=losses, optimizer='adam', metrics=['accuracy'])
+    m.compile(loss=custom_loss.get_weighted_loss(class_weights), optimizer='adam', metrics=['accuracy'])
 
     X_train, X_valid, y_train, y_valid = preprocess.split_train_valid(data, train[config.POSSIBLE_LABELS])
 
-    train, valid = preprocess.create_final_datasets(X_train, X_valid, y_train, y_valid)
 
     # fitting the model
     print('Training model...')
     r = m.fit(
-        train, epochs=config.EPOCHS, steps_per_epoch=X_train.shape[0] // config.BATCH_SIZE,
-        validation_data=valid, validation_steps=1, verbose=2,
+        X_train, y_train, epochs=config.EPOCHS,  batch_size=config.BATCH_SIZE,
+        validation_data=(X_valid, y_valid), verbose=2,
         callbacks=[config.callback_checkpoint, config.callback_earlystop]
     )
 
