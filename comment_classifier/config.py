@@ -19,3 +19,5 @@ callback_checkpoint = ModelCheckpoint(os.path.join(path, 'ckpt', "toxic_comments
                                       monitor='loss', verbose=2, save_best_only=True, mode='min', period=2)
 
 callback_earlystop = EarlyStopping(monitor='loss', patience=10, mode='min', verbose=1)
+
+SAVED_MODEL = "toxic_comments_lstm-epoch020-loss0.1146-val_acc0.0375.hdf5"

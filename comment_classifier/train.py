@@ -1,4 +1,5 @@
 import preprocess
+from comment_classifier.preprocess import Tokenize_Object
 import config
 import custom_loss
 import word_embeddings
@@ -18,7 +19,10 @@ def run_training():
     # extract and load pretrained wordembeddings
     word2vec = word_embeddings.load_pretr_wv()
     # tokenize and pad sequences
-    data = preprocess.tokenize(train, config.PATH)
+    tokenizer_object = Tokenize_Object(config.PATH)
+    data = tokenizer_object.tokenize(train)
+    # save tokenizer
+    tokenizer_object.save_tokenizer()
     # apply embeddings to layer weights
     embedding_layer = word_embeddings.apply_embeddings(word2vec)
     # build model

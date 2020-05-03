@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from tensorflow.data import Dataset
 
 
-def load(path: str, filename: str, col_list: list, dtypes) -> pd.DataFrame:
+def load(path: str, filename: str, col_list: list, dtypes=None) -> pd.DataFrame:
     train = pd.read_csv(os.path.join(path, filename), usecols=col_list, dtype=dtypes)
 
     return train
@@ -35,24 +35,55 @@ def compute_class_weights(labels: list, df: pd.DataFrame):
     return class_weights
 
 
-def tokenize(df: pd.DataFrame, path: str) -> np.array:
-    sentences = df["comment_text"].fillna("DUMMY_VALUE").values
-    # convert the sentences (strings) into integers
-    tokenizer = Tokenizer(num_words=config.MAX_VOCAB_SIZE)
-    tokenizer.fit_on_texts(sentences)
-    sequences = tokenizer.texts_to_sequences(sentences)
-    # get word -> integer mapping
-    word2idx = tokenizer.word_index
-    # save tokenizer
-    with open(os.path.join(path, 'tokenizer.pkl'), 'wb') as f:
-        pickle.dump(tokenizer, f)
-    print('Found %s unique tokens.' % len(word2idx))
+class Tokenize_Object():
 
-    # pad sequences so that we get a N x T matrix
-    data = pad_sequences(sequences, maxlen=config.MAX_SEQUENCE_LENGTH, padding=config.PADDING)
-    print('Shape of data tensor:', data.shape)
+    def __init__(self, path):
+        self.tokenizer = None
+        self.path = path
 
-    return data
+    def tokenize(self, df: pd.DataFrame) -> np.array:
+        sentences = df["comment_text"].fillna("DUMMY_VALUE").values
+        # convert the sentences (strings) into integers
+        self.tokenizer = Tokenizer(num_words=config.MAX_VOCAB_SIZE)
+        self.tokenizer.fit_on_texts(sentences)
+        sequences = self.tokenizer.texts_to_sequences(sentences)
+        # get word -> integer mapping
+        word2idx = self.tokenizer.word_index
+        # # save tokenizer
+        # with open(os.path.join(path, 'tokenizer.pkl'), 'wb') as f:
+        #     pickle.dump(tokenizer, f)
+        print('Found %s unique tokens.' % len(word2idx))
+
+        # pad sequences so that we get a N x T matrix
+        data = pad_sequences(sequences, maxlen=config.MAX_SEQUENCE_LENGTH, padding=config.PADDING)
+        print('Shape of data tensor:', data.shape)
+
+        return data
+
+    def save_tokenizer(self):
+        with open(os.path.join(self.path, 'tokenizer.pkl'), 'wb') as f:
+            pickle.dump(self.tokenizer, f)
+        print("Tokenizer just got saved")
+
+    @staticmethod
+    def load_tokenizer(path):
+        with open(os.path.join(path, "tokenizer.pkl"), "rb") as f:
+            tokenizer = pickle.load(f)
+
+        return tokenizer
+
+    @staticmethod
+    def tokenize_testdata(df: pd.DataFrame, tokenizer):
+        sentences = df["comment_text"].fillna("DUMMY_VALUE").values
+        # convert the sentences (strings) into integers
+        tokenizer.fit_on_texts(sentences)
+        sequences = tokenizer.texts_to_sequences(sentences)
+
+        # pad sequences
+        data = pad_sequences(sequences, maxlen=config.MAX_SEQUENCE_LENGTH, padding=config.PADDING)
+        print('Shape of data tensor:', data.shape)
+
+        return data
 
 
 def split_train_valid(data, targets):
