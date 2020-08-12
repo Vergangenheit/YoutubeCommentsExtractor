@@ -14,8 +14,9 @@ PATH = "drive/My Drive/ToxicCommentsDataset"
 FILENAME = "train_preprocessed.csv"
 LOSSES_FILE = "losses.pkl"
 DTYPES = dict(zip(POSSIBLE_LABELS, [np.int32]*len(POSSIBLE_LABELS)))
+GLOVE_ID = '1arONUQZTGBeDLNTgj2tfv9l3UwYjdh5n'
 
-callback_checkpoint = ModelCheckpoint(os.path.join(path, 'ckpt', "toxic_comments_lstm-epoch{epoch:03d}-loss{loss:.4f}-val_acc{val_accuracy:.4f}.hdf5"),
+callback_checkpoint = ModelCheckpoint(os.path.join(PATH, 'ckpt', "toxic_comments_lstm-epoch{epoch:03d}-loss{loss:.4f}-val_acc{val_accuracy:.4f}.hdf5"),
                                       monitor='loss', verbose=2, save_best_only=True, mode='min', period=2)
 
 callback_earlystop = EarlyStopping(monitor='loss', patience=10, mode='min', verbose=1)

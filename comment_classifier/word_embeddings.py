@@ -3,6 +3,15 @@ import numpy as np
 import config
 import pickle
 from tensorflow.keras.layers import Embedding
+from google_drive_downloader import GoogleDriveDownloader as gd
+
+
+def download_wemb():
+    if os.path.exists(os.path.join(os.getcwd(), 'glove')) is False:
+        os.makedirs(os.path.join(os.getcwd(), 'glove'))
+    gd.download_file_from_google_drive(file_id=config.GLOVE_ID,
+                                       dest_path=os.path.join(os.getcwd(), 'glove/glove.6B.zip'),
+                                       unzip=True)
 
 
 def load_pretr_wv():
@@ -46,3 +55,9 @@ def apply_embeddings(word2vec):
     )
 
     return embedding_layer
+
+
+if __name__ == "__main__":
+    print(os.getcwd())
+    print(os.path.exists(os.path.join(os.getcwd(), 'glove')))
+    download_wemb()
