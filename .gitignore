@@ -2,3 +2,4 @@ extractor/client_secret.json
 extractor/token.pickle
 comments.csv
 comment_classifier/glove
+venv
