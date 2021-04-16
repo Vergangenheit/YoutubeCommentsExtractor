@@ -1,6 +1,7 @@
 from extractor.service import get_authenticated_service
 from extractor.store_comments import write_to_csv
 import os
+from googleapiclient.discovery import Resource
 
 
 def get_videos(service, max_pages, **kwargs):
@@ -44,6 +45,29 @@ def get_video_comments(service, **kwargs):
     return comments
 
 
+def get_video_comments_multiples(service: Resource, videoId: str, textFormat: str):
+    comments = []
+    try:
+        results = service.commentThreads().list(videoId=videoId, part='snippet', textFormat=textFormat).execute()
+
+        while results:
+            for item in results['items']:
+                comment = item['snippet']['topLevelComment']['snippet']['textDisplay']
+                comments.append(comment)
+
+            if 'nextPageToken' in results:
+                pageToken = results['nextPageToken']
+                results = service.commentThreads().list(videoId=videoId, part='snippet', textFormat=textFormat,
+                                                  pageToken=pageToken).execute()
+            else:
+                break
+
+    except Exception as e:
+        print(e)
+
+    print(comments)
+
+
 def search_videos_by_keyword(service, **kwargs):
     results = get_videos(service, **kwargs)
     for item in results:
@@ -59,7 +83,7 @@ def search_videos_comments_by_keyword(service, max_pages, **kwargs):
         print('%s - %s' % (title, video_id))
         comments = get_video_comments(service, part='snippet', videoId=video_id, textFormat='plainText')
         final_results.extend([(video_id, title, comment) for comment in comments])
-        #print(comments)
+        # print(comments)
 
     write_to_csv(final_results)
 
@@ -68,5 +92,6 @@ if __name__ == "__main__":
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     service = get_authenticated_service()
     keyword = input('Enter a keyword: ')
-    search_videos_comments_by_keyword(service=service, max_pages=1, q=keyword, part='id, snippet', eventType='completed',
+    search_videos_comments_by_keyword(service=service, max_pages=1, q=keyword, part='id, snippet',
+                                      eventType='completed',
                                       type='video')

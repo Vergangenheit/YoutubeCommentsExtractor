@@ -65,5 +65,9 @@ async def get_video_comments_multiples(videoId: str, textFormat: str):
 if __name__ == "__main__":
     # asyncio.run(get_videos(q='David Goggins', part='id, snippet', eventType='completed',
     #                                   type='video'))
+    t0: float = time.perf_counter()
     asyncio.run(get_video_comments_multiples(videoId='5tSTk1083VY', textFormat='plainText'))
+
+    t1: float = time.perf_counter()
+    print(f"Done in {t1 - t0}")
     # main(q='David Goggins', part='id, snippet', eventType='completed', type='video', textFormat='plainText')
