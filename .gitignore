@@ -4,3 +4,4 @@ comments.csv
 comment_classifier/glove
 venv/
 .idea/
+config.py
