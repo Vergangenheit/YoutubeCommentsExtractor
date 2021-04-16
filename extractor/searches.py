@@ -2,7 +2,7 @@ from extractor.service import get_authenticated_service
 from extractor.store_comments import write_to_csv
 import os
 from googleapiclient.discovery import Resource
-
+import time
 
 def get_videos(service, max_pages, **kwargs):
     final_results = []
@@ -90,8 +90,12 @@ def search_videos_comments_by_keyword(service, max_pages, **kwargs):
 
 if __name__ == "__main__":
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    # keyword = input('Enter a keyword: ')
+    t0: float = time.perf_counter()
     service = get_authenticated_service()
-    keyword = input('Enter a keyword: ')
-    search_videos_comments_by_keyword(service=service, max_pages=1, q=keyword, part='id, snippet',
-                                      eventType='completed',
-                                      type='video')
+    get_video_comments_multiples(service, videoId='5tSTk1083VY', textFormat='plainText')
+    t1: float = time.perf_counter()
+    print(f"Done in {t1 - t0}")
+    # search_videos_comments_by_keyword(service=service, max_pages=1, q=keyword, part='id, snippet',
+    #                                   eventType='completed',
+    #                                   type='video')
